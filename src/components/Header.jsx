@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import GoogleApi from './GoogleAPIs';
+
 const Header = () => {
   return (
     <div className='ui secondary pointing menu'>
@@ -11,6 +13,9 @@ const Header = () => {
         <Link to='/' className='item'>
           All Streamers
         </Link>
+      </div>
+      <div className=''>
+        <GoogleApi />
       </div>
     </div>
   );
