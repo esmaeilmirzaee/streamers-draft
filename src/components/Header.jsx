@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import GoogleApi from './GoogleAPIs';
+import GoogleAuth from './GoogleAuth';
 
 const Header = () => {
   return (
@@ -15,7 +15,7 @@ const Header = () => {
         </Link>
       </div>
       <div className=''>
-        <GoogleApi />
+        <GoogleAuth />
       </div>
     </div>
   );

@@ -1,70 +1,165 @@
-# Getting Started with Create React App
+# Integrating Redux with React
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+1. npm install react react-redux
+2. create `actions/index.jsx`
+3. create `reducers/index.jsx`
 
-## Available Scripts
+> **src/reducers/index.jsx**
 
-In the project directory, you can run:
+```javascript
+import { combineReducers } from 'redux';
 
-### `yarn start`
+export default combineReducers({
+  replaceME: () => 5,
+});
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+> **src/index.jsx**
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```javascript
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
 
-### `yarn test`
+import reducers from './reducers';
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+const store = createStore(reducers);
 
-### `yarn build`
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.querySelector('#root')
+);
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+> **src/actions/index.jsx**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```javascript
+export const signIn = () => {
+  return {
+    type: 'SIGN_IN',
+  };
+};
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+export const signOut = () => {
+  return {
+    type: 'SIGN_OUT',
+  };
+};
+```
 
-### `yarn eject`
+> **src/components/GoogleAuth.jsx**
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```javascript
+import { connect } from 'react-redux';
+import { signIn, signOut } from '../actions';
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+class GoogleAuth extends React.Component {
+  componentDidMount() {
+    window.gapi.load('client:auth2', () => {
+      window.gapi.client
+        .init({
+          clientId: '',
+          scope: 'email',
+        })
+        .then(() => {
+          this.auth = window.gapi.auth2.getAuthInstance();
+          this.onAuthChange(this.auth.isSignedIn.get());
+          this.auth.isSignedIn.listen(this.onAuthChange);
+        });
+    });
+  }
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+  onAuthChange = (isSignedIn) => {
+    if (isSignedIn) {
+      this.props.signIn();
+    } else {
+      this.props.signOut();
+    }
+  };
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+  onSignInClick = () => {
+    this.auth.signIn();
+  };
 
-## Learn More
+  onSignOutClick = () => {
+    this.auth.signOut();
+  };
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+  renderAuthButton() {
+    if (this.props.isSignedIn == null) {
+      return null;
+    } else if (this.props.isSignedIn) {
+      return (
+        <button className='ui google button'>
+          <i className='google icon'></i>
+          Sign out
+        </button>
+      );
+    } else {
+      return (
+        <button className='ui google button'>
+          <i className='google icon'></i>
+          Sign In
+        </button>
+      );
+    }
+  }
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+  render() {
+    return <>{this.renderAuthButton()}</>;
+  }
+}
 
-### Code Splitting
+const mapStateToProps = (state) => {
+  return { isSignedIn: state.auth.isSignedIn };
+};
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+export default connect(mapStateToProps, { signIn, signOut })(GoogleAuth);
+```
 
-### Analyzing the Bundle Size
+> **src/reducers/authReducer.jsx**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```javascript
+const INITIAL_STATE = {
+  isSignedIn:null
+}
 
-### Making a Progressive Web App
+export default (state=INITIAL_STATE, action) {
+  if (action.type == 'SIGN_IN') {
+    return {...state, isSignedIn: true};
+  } else if (action.type == 'SIGN_OUT') {
+    return {...state, isSignedIn: false};
+  }
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+  return state;
+}
+```
 
-### Advanced Configuration
+> **src/reducers/index.jsx**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```javascript
+import authReducer from './authReducer';
 
-### Deployment
+export default combineReducers({
+  auth: authReducer,
+});
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+> In order to prevent typo-related errors, create `src/actions/types.jsx` then
 
-### `yarn build` fails to minify
+```javascript
+export const SIGN_IN = 'SIGN_IN';
+export const SIGN_OUT = 'SIGN_OUT';
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+and then import them as follow and use the variables instead of the string characters.
+
+```javascript
+import { SIGN_IN, SIGN_OUT } from 'path/to/types.jsx';
+```
+
+_NOTE_: to save the current user's id
+`gapi.auth2.getAuthInstance().currentUser.get().getId()`
+
+`this.auth.currentUser.get().getId()`
