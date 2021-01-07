@@ -51,7 +51,9 @@ class GoogleApis extends React.Component {
     }
   };
 
-  onAuthChange = () => {};
+  onAuthChange = () => {
+    this.setState({ isSignedIn: this.auth.isSignedIn.get() });
+  };
 
   render() {
     return <>{this.renderOnAuthChangeButton()}</>;
