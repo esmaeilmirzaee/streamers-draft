@@ -72,7 +72,7 @@ class GoogleAuth extends React.Component {
 
   onAuthChange = (isSignedIn) => {
     if (isSignedIn) {
-      this.props.signIn();
+      this.props.signIn(this.auth.currentUser.get().getId());
     } else {
       this.props.signOut();
     }
@@ -163,3 +163,44 @@ _NOTE_: to save the current user's id
 `gapi.auth2.getAuthInstance().currentUser.get().getId()`
 
 `this.auth.currentUser.get().getId()`
+
+> **src/actions/index.jsx**
+
+```javascript
+export const signIn = (userId) => {
+  return {
+    type: SIGN_IN,
+    payload: userId,
+  };
+};
+```
+
+> **src/components/GoogleAuth.jsx**
+
+```javascript
+onAuthChange = (isSignedIn) => {
+  if (isSignedIn) {
+    this.props.signIn(this.auth.currentUser.get().getId());
+  } else {
+    this.props.signOut();
+  }
+};
+```
+
+> **src/reducers/authReducer.jsx**
+
+```javascript
+const INITIAL_STATE = {
+  isSignedIn: null,
+  userId: null,
+};
+
+export default (state = INITIAL_STATE, action) => {
+  if (action.type == SIGN_IN) {
+    return { ...state, isSignedIn: true, userId: action.payload };
+  } else if (action.type == SIGN_OUT) {
+    return { ...state, isSignedIn: false, userId: null };
+  }
+  return state;
+};
+```
