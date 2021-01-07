@@ -204,3 +204,20 @@ export default (state = INITIAL_STATE, action) => {
   return state;
 };
 ```
+
+# Redux devtools
+
+> **src/index.jsx**
+
+```javascript
+import { createStore, applyMiddleware, compose } from 'redux';
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const store = createStore(reducers, composeEnhancers(applyMiddleware()));
+```
+
+> Save all data in Redux store between refreshes of the page
+
+```javascript
+localhost:3000?debug_session=<some_string>
+```
