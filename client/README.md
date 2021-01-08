@@ -221,3 +221,86 @@ const store = createStore(reducers, composeEnhancers(applyMiddleware()));
 ```javascript
 localhost:3000?debug_session=<some_string>
 ```
+
+# Redux Forma
+
+`npm install --save redux-from`
+
+> **src/reducers/index.jsx**
+
+```javascript
+import { reducer as formReducer } from 'redux-form';
+
+export default combineReducers({
+  auth: authReducer,
+  form: formReducer,
+});
+```
+
+> **src/components/StreamCreate.jsx**
+
+```javascript
+import { Field, reduxForm } from 'redux-form';
+
+class StreamCreate extends React.Component {
+  render() {
+    return (
+      <React.Fragment>
+        <Field name='title' />
+      </React.Fragment>
+    );
+  }
+}
+
+const validate = (formValues) => {
+  let errors = {};
+  if (!formValues.title) {
+    this.errors.title = 'Please provide a valid title';
+  }
+
+  if (!formValues.description) {
+    this.errors.description =
+      'Please add description to help others to find your stream easily';
+  }
+
+  return errors;
+};
+
+export default reduxForm({
+  form: 'streamCreate',
+  validate,
+})(StreamCreate);
+```
+
+**ERRORS**:
+
+1. _Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined._
+
+2. _Element is undefiend_
+
+**Solution**:
+
+1. be careful, use reference to `renderInput` and do not call it.
+   `return <input onChange={formProps.input.onChange} value={formProps.input.value}>`
+   could be shorten to
+   `return <input {...formProps.input}>`
+
+```javascript
+renderInput(formProps) {
+  return <input onChange={formProps.input.onChange} value={formProps.input.value}>
+}
+
+onSubmit(formValues) {
+  console.log(formValues)
+}
+
+render() {
+  return (
+    <form onSubmit={this.props.handleSubmit(this.onSubmit)} className='ui form'>
+      <Field name='' component={this.renderInput} />
+    </form>
+  )
+}
+```
+
+2. Simply put, convert the _simple_ function into an arrow function.
