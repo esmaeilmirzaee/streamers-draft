@@ -240,14 +240,57 @@ export default combineReducers({
 > **src/components/StreamCreate.jsx**
 
 ```javascript
+import React from 'react';
 import { Field, reduxForm } from 'redux-form';
 
 class StreamCreate extends React.Component {
-  render() {
+  renderError({ error, touched }) {
+    if (error && touched) {
+      return <div className='ui error message'>{error}</div>;
+    }
+  }
+
+  renderInput({ input, placeholder, meta }) {
     return (
-      <React.Fragment>
-        <Field name='title' />
-      </React.Fragment>
+      <div className={meta.error && meta.touched ? 'field error' : 'field'}>
+        <input {...input} autoComplete='off' placeholder={placeholder} />
+        <>
+          {meta.error && meta.touched ? (
+            <div className='ui red'>{meta.error}</div>
+          ) : (
+            ''
+          )}
+        </>
+      </div>
+    );
+  }
+
+  onSubmit(formValues) {
+    console.log(formValues);
+  }
+
+  render() {
+    const className = true ? 'ui error form ' : 'ui form';
+    return (
+      <>
+        <h1>StreamCreate</h1>
+        <form
+          onSubmit={this.props.handleSubmit(this.onSubmit)}
+          className={className}
+        >
+          <Field
+            name='title'
+            component={this.renderInput}
+            placeholder='Enter a title'
+          />
+          <Field
+            name='description'
+            component={this.renderInput}
+            placeholder='How the stream could be catagorised?'
+          />
+          <button className='ui blue button'>Submit</button>
+        </form>
+      </>
     );
   }
 }
@@ -255,12 +298,10 @@ class StreamCreate extends React.Component {
 const validate = (formValues) => {
   let errors = {};
   if (!formValues.title) {
-    this.errors.title = 'Please provide a valid title';
+    errors.title = 'Please enter a valid title';
   }
-
   if (!formValues.description) {
-    this.errors.description =
-      'Please add description to help others to find your stream easily';
+    errors.description = 'Please enter the appropriate description';
   }
 
   return errors;
@@ -304,3 +345,49 @@ render() {
 ```
 
 2. Simply put, convert the _simple_ function into an arrow function.
+
+# Sample code
+
+```javascript
+// Array-based approach
+const streamReducer = (state = [], action) => {
+  switch (action.type) {
+    case EDIT_STREAM:
+      return state.map((stream) => {
+        if (stream.id === action.payload.id) {
+          return action.payload;
+        } else {
+          return stream;
+        }
+      });
+    default:
+      return state;
+  }
+};
+```
+
+```javascript
+// Object-based approach version 1
+const streamReducer = (state = {}, action) => {
+  switch (action.type) {
+    case EDIT_STREAM:
+      const newState = { ...state };
+      newState[action.payload.id] = action.payload;
+      return newState;
+    default:
+      return state;
+  }
+};
+```
+
+```javascript
+// Object-based approach version 2
+const streamReducer = (state = {}, action) => {
+  switch (action.type) {
+    case EDIT_STREAM:
+      return { ...state, [action.payload.id]: action.payload }; // key interpolation
+    default:
+      return state;
+  }
+};
+```
