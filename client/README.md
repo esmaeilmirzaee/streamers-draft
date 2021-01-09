@@ -391,3 +391,25 @@ const streamReducer = (state = {}, action) => {
   }
 };
 ```
+
+# Custom history
+
+1. Create `history` file then import it into `App.jsx`. Next, replace `BrowserRouter` with `Router`.
+2. Give `history` as a parameter to the `Router` component.
+3. Finally, use history inside `src/actions/index.jsx` then add `history.push('/')` to the appropriate place.
+   > **src/history.js**
+
+```javascript
+import createHistory from 'history/createBrowserHistory';
+
+export default createHistory();
+```
+
+> **src/components/App.jsx**
+
+```javascript
+import { Router } from 'react-router-dom';
+import history from './history';
+
+<Router history={history}></Router>;
+```
