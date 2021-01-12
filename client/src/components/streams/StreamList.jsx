@@ -52,7 +52,7 @@ class StreamList extends React.Component {
       return (
         <div className='text-right'>
           <Link to='/streams/new'>
-            <button className='ui button'>Create</button>
+            <button className='ui floated right button'>Create</button>
           </Link>
         </div>
       );

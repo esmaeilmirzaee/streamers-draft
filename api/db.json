@@ -12,14 +12,13 @@
     },
     {
       "title": "A new stream",
-      "description": "something you might dazzle",
+      "description": "Something you might dazzle",
       "userId": "108007441252634977857",
       "id": 3
     },
     {
       "title": "A new stream",
-      "description": "something you might dazzle",
-      "userId": "108007441252634977857",
+      "description": "Something you might dazzle",
       "id": 4
     },
     {
@@ -27,6 +26,12 @@
       "description": "Check this should be pushed",
       "userId": "108007441252634977857",
       "id": 5
+    },
+    {
+      "title": "Me streaming component reuse",
+      "description": "Watch me refactor some components.",
+      "userId": "108007441252634977857",
+      "id": 6
     }
   ]
 }
